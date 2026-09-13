@@ -43,6 +43,8 @@ const PRICE = { daily: 3, weekly: 12, monthly: 18 };
 let session = null;
 let currentLicense = null;
 let paymentPoll = null;
+let pendingPixPaymentId = null;
+let pendingPixBaselineExpiresAt = 0;
 
 const sessionResult = await supabase.auth.getSession();
 session = sessionResult.data.session;
@@ -209,6 +211,13 @@ async function loadPayments() {
 async function startPix(planKey) {
   if (!PRICE[planKey]) return;
 
+  // Guarda a validade atual ANTES de gerar um novo Pix.
+  // Assim uma licença que já estava ativa não é confundida com o novo pagamento.
+  pendingPixBaselineExpiresAt = currentLicense?.expires_at
+    ? new Date(currentLicense.expires_at).getTime()
+    : 0;
+  pendingPixPaymentId = null;
+
   openPixModal();
   resetPixModal();
   els.pixPlanLabel.textContent = `${PLAN[planKey].name} · ${formatBRL(PRICE[planKey])}`;
@@ -239,6 +248,8 @@ async function startPix(planKey) {
     }
 
     const pix = result.pix || {};
+    pendingPixPaymentId = result.payment_id ? String(result.payment_id) : null;
+
     if (!pix.copy_paste) throw new Error('O Mercado Pago não retornou o código Pix.');
 
     els.pixCode.value = pix.copy_paste;
@@ -272,27 +283,59 @@ function stopPaymentPolling() {
 }
 
 async function checkPaymentState(manual = false) {
-  const before = currentLicense?.expires_at ? new Date(currentLicense.expires_at).getTime() : 0;
-  const previousPlan = currentLicense?.plan;
+  // 1) Forma principal: verifica exatamente o pagamento Pix que acabou de ser criado.
+  if (pendingPixPaymentId) {
+    const { data: payment, error: paymentError } = await supabase
+      .from('payments')
+      .select('mercado_pago_payment_id,status,plan,amount,paid_at')
+      .eq('user_id', user.id)
+      .eq('mercado_pago_payment_id', pendingPixPaymentId)
+      .maybeSingle();
+
+    if (!paymentError && payment?.status === 'approved') {
+      await finishApprovedPix();
+      return;
+    }
+  }
+
+  // 2) Fallback: confirma que a validade realmente AUMENTOU após a criação deste Pix.
+  // Nunca basta a licença já estar ativa.
   const license = await loadLicense(false);
   if (!license) return;
 
-  const after = license.expires_at ? new Date(license.expires_at).getTime() : 0;
-  const becamePaid = license.plan !== 'trial' && (license.plan !== previousPlan || after > before);
+  const after = license.expires_at
+    ? new Date(license.expires_at).getTime()
+    : 0;
 
-  if (becamePaid || (license.plan !== 'trial' && license.status === 'active' && after > Date.now())) {
-    els.pixStatus.className = 'pix-status approved';
-    els.pixStatus.innerHTML = '<span class="approved-check">✓</span><span>Pagamento aprovado · licença ativada</span>';
-    stopPaymentPolling();
-    await loadPayments();
-    setTimeout(closePixModal, 2200);
+  if (
+    pendingPixBaselineExpiresAt > 0 &&
+    after > pendingPixBaselineExpiresAt
+  ) {
+    await finishApprovedPix();
     return;
   }
 
   if (manual) {
     els.pixStatus.className = 'pix-status waiting';
-    els.pixStatus.innerHTML = '<span class="pulse-dot"></span><span>Pagamento ainda não identificado. Continuamos verificando...</span>';
+    els.pixStatus.innerHTML =
+      '<span class="pulse-dot"></span><span>Pagamento ainda não identificado. Continuamos verificando...</span>';
   }
+}
+
+async function finishApprovedPix() {
+  els.pixStatus.className = 'pix-status approved';
+  els.pixStatus.innerHTML =
+    '<span class="approved-check">✓</span><span>Pagamento aprovado · licença ativada</span>';
+
+  stopPaymentPolling();
+
+  // Atualiza a tela e o histórico antes de fechar o modal.
+  await Promise.all([
+    loadLicense(false),
+    loadPayments(),
+  ]);
+
+  setTimeout(closePixModal, 2200);
 }
 
 function openPixModal() {
@@ -303,6 +346,8 @@ function openPixModal() {
 
 function closePixModal() {
   stopPaymentPolling();
+  pendingPixPaymentId = null;
+  pendingPixBaselineExpiresAt = 0;
   els.pixModal.classList.remove('open');
   els.pixModal.setAttribute('aria-hidden', 'true');
   document.body.classList.remove('modal-open');
