@@ -1,0 +1,3 @@
+import { supabase } from './supabase-client.js';
+const {data:{session}}=await supabase.auth.getSession();if(session)location.href='conta.html';
+const form=document.querySelector('#form'),msg=document.querySelector('#msg');form.addEventListener('submit',async e=>{e.preventDefault();msg.className='msg';msg.textContent='Entrando...';const email=document.querySelector('#email').value.trim();const password=document.querySelector('#password').value;const {error}=await supabase.auth.signInWithPassword({email,password});if(error){msg.className='msg error';msg.textContent='E-mail ou senha inválidos.';return;}location.href='conta.html';});

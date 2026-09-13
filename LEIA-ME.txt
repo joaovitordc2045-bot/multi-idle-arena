@@ -1,0 +1,19 @@
+MULTI IDLE ARENA - SITE INICIAL
+
+Arquivos principais:
+- index.html      = site oficial
+- cadastro.html   = cadastro no Supabase
+- login.html      = login
+- conta.html      = área do cliente/licença
+- config.js       = URL + publishable key do Supabase
+
+Teste local:
+Como os arquivos usam JavaScript modules, abra a pasta com um servidor HTTP local.
+Exemplo com Python:
+  python -m http.server 8080
+Depois abra:
+  http://localhost:8080
+
+Supabase:
+O cadastro usa Auth e o trigger já criado no banco gera profile + Trial de 8 horas.
+Os planos ainda não cobram; Mercado Pago entra na próxima fase.
