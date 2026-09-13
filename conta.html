@@ -1,1 +1,164 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Minha conta — Multi Idle Arena</title><link rel="stylesheet" href="styles.css"></head><body><div class="bg"></div><nav class="nav"><a class="brand" href="index.html"><img src="assets/arena-logo.png"><span>MULTI IDLE <em>ARENA</em></span></a><div class="navlinks"><button id="logout" class="btn danger">Sair</button></div></nav><main class="dashboard"><div class="topline"><div><div class="eyebrow">MINHA CONTA</div><h1>Licença</h1><p class="muted" id="email">Carregando...</p></div></div><div class="license-grid"><div class="metric"><span>Plano atual</span><strong id="plan">—</strong></div><div class="metric"><span>Status</span><strong id="status">—</strong></div><div class="metric"><span>Tempo restante</span><strong id="remaining">—</strong></div></div><h2>Planos</h2><div class="plans"><div class="card"><h3>Diário</h3><div class="price">R$ 3 <small>/ dia</small></div><button class="btn" disabled>Mercado Pago em breve</button></div><div class="card"><h3>Semanal</h3><div class="price">R$ 12 <small>/ semana</small></div><button class="btn" disabled>Mercado Pago em breve</button></div><div class="card recommended"><div class="eyebrow">MELHOR CUSTO-BENEFÍCIO</div><h3>Mensal</h3><div class="price">R$ 18 <small>/ mês</small></div><button class="btn primary" disabled>Mercado Pago em breve</button></div></div><div class="accountbox"><h3>Launcher</h3><p class="muted">O login desta conta já pode ser usado no Multi Idle Arena.</p></div><div id="msg" class="msg"></div></main><script type="module" src="conta.js"></script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Minha conta — Multi Idle Arena</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="bg"></div>
+
+  <nav class="nav">
+    <a class="brand" href="index.html">
+      <img src="assets/arena-logo.png" alt="Multi Idle Arena">
+      <span>MULTI IDLE <em>ARENA</em></span>
+    </a>
+    <div class="navlinks">
+      <a class="btn ghost hide-sm" href="index.html">Página inicial</a>
+      <button id="logout" class="btn danger">Sair</button>
+    </div>
+  </nav>
+
+  <main class="dashboard account-dashboard">
+    <section class="account-hero">
+      <div>
+        <div class="eyebrow">MINHA CONTA</div>
+        <h1>Olá, <span id="displayName">jogador</span>.</h1>
+        <p class="muted account-email" id="email">Carregando sua conta...</p>
+      </div>
+      <div id="licenseBadge" class="license-badge loading">
+        <span class="license-dot"></span>
+        <span id="licenseBadgeText">Verificando licença</span>
+      </div>
+    </section>
+
+    <section class="license-overview">
+      <div class="license-primary-card">
+        <div class="license-primary-top">
+          <div>
+            <span class="metric-label">PLANO ATUAL</span>
+            <strong id="plan" class="license-plan">—</strong>
+          </div>
+          <span id="planTag" class="plan-tag">—</span>
+        </div>
+        <div class="license-expiry-row">
+          <div>
+            <span class="metric-label">VALIDADE</span>
+            <strong id="expiresAt">—</strong>
+          </div>
+          <div>
+            <span class="metric-label">TEMPO RESTANTE</span>
+            <strong id="remaining">—</strong>
+          </div>
+        </div>
+        <div class="license-actions">
+          <button id="renewBtn" class="btn primary">Renovar licença</button>
+          <button id="refreshLicense" class="btn">Atualizar status</button>
+        </div>
+      </div>
+
+      <div class="account-side-card">
+        <span class="metric-label">STATUS</span>
+        <strong id="status" class="status-big">—</strong>
+        <p id="statusDescription" class="muted">Carregando informações da licença...</p>
+        <div class="account-id-row">
+          <span>Conta</span>
+          <b id="accountShortId">—</b>
+        </div>
+      </div>
+    </section>
+
+    <section id="plansSection" class="account-section">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow">RENOVAÇÃO</div>
+          <h2>Escolha seu plano</h2>
+          <p class="muted">O tempo comprado é somado à validade atual quando sua licença ainda estiver ativa.</p>
+        </div>
+      </div>
+
+      <div class="plans account-plans">
+        <article class="card plan-card">
+          <div class="plan-duration">1 DIA</div>
+          <h3>Diário</h3>
+          <div class="price">R$ 3 <small>/ dia</small></div>
+          <p>Ideal para usar o Multi Idle Arena por um período curto.</p>
+          <button class="btn pix-plan-btn" data-plan="daily">Pagar R$ 3 via Pix</button>
+        </article>
+
+        <article class="card plan-card">
+          <div class="plan-duration">7 DIAS</div>
+          <h3>Semanal</h3>
+          <div class="price">R$ 12 <small>/ semana</small></div>
+          <p>Mais tempo de acesso com um único pagamento.</p>
+          <button class="btn pix-plan-btn" data-plan="weekly">Pagar R$ 12 via Pix</button>
+        </article>
+
+        <article class="card recommended plan-card">
+          <div class="eyebrow">MELHOR CUSTO-BENEFÍCIO</div>
+          <div class="plan-duration">30 DIAS</div>
+          <h3>Mensal</h3>
+          <div class="price">R$ 18 <small>/ mês</small></div>
+          <p>O menor custo por dia para quem usa com frequência.</p>
+          <button class="btn primary pix-plan-btn" data-plan="monthly">Pagar R$ 18 via Pix</button>
+        </article>
+      </div>
+    </section>
+
+    <section class="account-section">
+      <div class="section-heading history-heading">
+        <div>
+          <div class="eyebrow">FINANCEIRO</div>
+          <h2>Histórico de pagamentos</h2>
+          <p class="muted">Pagamentos registrados na sua conta do Multi Idle Arena.</p>
+        </div>
+        <button id="refreshPayments" class="btn ghost small-btn">Atualizar</button>
+      </div>
+      <div id="paymentsList" class="payments-list">
+        <div class="empty-state">Carregando pagamentos...</div>
+      </div>
+    </section>
+
+    <section class="account-section launcher-card">
+      <div>
+        <div class="eyebrow">LAUNCHER</div>
+        <h2>Multi Idle Arena para Windows</h2>
+        <p class="muted">Use o mesmo e-mail e senha desta conta para entrar no launcher.</p>
+      </div>
+      <button class="btn" disabled title="O download oficial será publicado na próxima etapa">Download em preparação</button>
+    </section>
+
+    <div id="msg" class="msg"></div>
+  </main>
+
+  <div id="pixModal" class="site-modal" aria-hidden="true">
+    <div class="site-modal-backdrop" data-close-pix></div>
+    <div class="site-modal-card pix-site-card" role="dialog" aria-modal="true" aria-labelledby="pixTitle">
+      <button class="modal-close" type="button" data-close-pix aria-label="Fechar">×</button>
+      <div class="eyebrow">PAGAMENTO SEGURO</div>
+      <h2 id="pixTitle">Pagar com Pix</h2>
+      <p id="pixPlanLabel" class="muted">Gerando cobrança...</p>
+
+      <div id="pixLoading" class="pix-loading">Gerando seu Pix...</div>
+
+      <div id="pixContent" class="pix-content hidden">
+        <div class="pix-amount" id="pixAmount">R$ 0,00</div>
+        <img id="pixQr" class="pix-qr" alt="QR Code Pix">
+        <label class="pix-copy-label" for="pixCode">Pix Copia e Cola</label>
+        <textarea id="pixCode" class="pix-code" readonly></textarea>
+        <button id="copyPix" class="btn primary full-btn">Copiar código Pix</button>
+        <div id="pixStatus" class="pix-status waiting">
+          <span class="pulse-dot"></span>
+          <span>Aguardando pagamento...</span>
+        </div>
+        <button id="checkPix" class="btn ghost full-btn">Já paguei · verificar agora</button>
+      </div>
+
+      <div id="pixError" class="msg error hidden"></div>
+    </div>
+  </div>
+
+  <script type="module" src="conta.js"></script>
+</body>
+</html>
