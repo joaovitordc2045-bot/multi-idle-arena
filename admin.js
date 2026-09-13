@@ -13,6 +13,8 @@ const els = {
   editModal: document.querySelector('#editModal'),
   modalEmail: document.querySelector('#modalEmail'),
   modalCurrentExpiry: document.querySelector('#modalCurrentExpiry'),
+  planSelect: document.querySelector('#planSelect'),
+  statusSelect: document.querySelector('#statusSelect'),
   expiryInput: document.querySelector('#expiryInput'),
   saveExpiryBtn: document.querySelector('#saveExpiryBtn'),
   modalMsg: document.querySelector('#modalMsg'),
@@ -128,7 +130,9 @@ function renderClients(clients) {
         <button class="btn primary manage-client"
           data-user="${escapeAttr(client.user_id)}"
           data-email="${escapeAttr(client.email || '')}"
-          data-expiry="${escapeAttr(client.expires_at || '')}">
+          data-expiry="${escapeAttr(client.expires_at || '')}"
+          data-plan="${escapeAttr(client.plan || 'manual')}"
+          data-status="${escapeAttr(client.status || 'active')}">
           Gerenciar
         </button>
       </article>`;
@@ -140,6 +144,8 @@ function renderClients(clients) {
         user_id: button.dataset.user,
         email: button.dataset.email,
         expires_at: button.dataset.expiry || null,
+        plan: button.dataset.plan || 'manual',
+        status: button.dataset.status || 'active',
       };
       openModal();
     });
@@ -172,6 +178,14 @@ function openModal() {
       ? current.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
       : 'Sem validade';
 
+  els.planSelect.value = ['trial','daily','weekly','monthly','manual'].includes(selectedClient.plan)
+    ? selectedClient.plan
+    : 'manual';
+
+  els.statusSelect.value = ['active','expired','blocked'].includes(selectedClient.status)
+    ? selectedClient.status
+    : 'active';
+
   els.expiryInput.value =
     current && !Number.isNaN(current.getTime())
       ? toDatetimeLocal(current)
@@ -194,6 +208,9 @@ async function saveExpiry() {
   if (!selectedClient) return;
 
   const value = els.expiryInput.value;
+  const plan = els.planSelect.value;
+  const status = els.statusSelect.value;
+
   if (!value) {
     setModalMessage('Escolha uma data e hora.', 'error');
     return;
@@ -208,21 +225,26 @@ async function saveExpiry() {
   els.saveExpiryBtn.disabled = true;
   setModalMessage('Salvando...', '');
 
-  const { data, error } = await supabase.rpc('admin_set_expiry', {
+  const { data, error } = await supabase.rpc('admin_update_license', {
     p_user_id: selectedClient.user_id,
     p_expires_at: date.toISOString(),
+    p_plan: plan,
+    p_status: status,
   });
 
   els.saveExpiryBtn.disabled = false;
 
   if (error) {
     console.error(error);
-    setModalMessage('Não foi possível alterar a validade.', 'error');
+    setModalMessage('Não foi possível salvar as alterações.', 'error');
     return;
   }
 
   selectedClient.expires_at = data?.expires_at || date.toISOString();
-  setModalMessage('Validade atualizada com sucesso.', 'ok');
+  selectedClient.plan = data?.plan || plan;
+  selectedClient.status = data?.status || status;
+
+  setModalMessage('Licença atualizada com sucesso.', 'ok');
 
   setTimeout(async () => {
     closeModal();
@@ -247,6 +269,11 @@ async function addDays(days) {
   }
 
   selectedClient.expires_at = data?.expires_at || selectedClient.expires_at;
+  selectedClient.plan = data?.plan || 'manual';
+  selectedClient.status = data?.status || 'active';
+  els.planSelect.value = selectedClient.plan;
+  els.statusSelect.value = selectedClient.status;
+
   const updated = selectedClient.expires_at ? new Date(selectedClient.expires_at) : null;
 
   els.modalCurrentExpiry.textContent =
@@ -268,6 +295,7 @@ function planLabel(plan) {
     daily: 'Diário',
     weekly: 'Semanal',
     monthly: 'Mensal',
+    manual: 'Manual/Admin',
   }[plan] || (plan || 'Sem plano');
 }
 

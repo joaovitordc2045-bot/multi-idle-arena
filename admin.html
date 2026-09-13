@@ -83,10 +83,26 @@
         <strong id="modalCurrentExpiry">—</strong>
       </div>
 
-      <label class="admin-label" for="expiryInput">Nova data e hora de vencimento</label>
+      <label class="admin-label" for="planSelect">Plano</label>
+      <select id="planSelect" class="admin-input">
+        <option value="trial">Trial</option>
+        <option value="daily">Diário</option>
+        <option value="weekly">Semanal</option>
+        <option value="monthly">Mensal</option>
+        <option value="manual">Manual/Admin</option>
+      </select>
+
+      <label class="admin-label" for="statusSelect" style="margin-top:14px">Status</label>
+      <select id="statusSelect" class="admin-input">
+        <option value="active">Ativo</option>
+        <option value="expired">Expirado</option>
+        <option value="blocked">Bloqueado</option>
+      </select>
+
+      <label class="admin-label" for="expiryInput" style="margin-top:14px">Nova data e hora de vencimento</label>
       <input id="expiryInput" class="admin-input" type="datetime-local">
 
-      <button id="saveExpiryBtn" class="btn primary full-admin-btn">Salvar nova validade</button>
+      <button id="saveExpiryBtn" class="btn primary full-admin-btn">Salvar alterações</button>
 
       <div class="quick-title">Adicionar tempo rapidamente</div>
       <div class="quick-grid">
