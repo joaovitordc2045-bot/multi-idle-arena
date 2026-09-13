@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Central Administrativa — Multi Idle Arena</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <div class="bg"></div>
+
+  <nav class="nav">
+    <a class="brand" href="index.html">
+      <img src="arena-logo.png" alt="Multi Idle Arena">
+      <span>MULTI IDLE <em>ARENA</em></span>
+    </a>
+    <div class="navlinks">
+      <a class="btn ghost" href="conta.html">Minha conta</a>
+      <button id="logout" class="btn danger">Sair</button>
+    </div>
+  </nav>
+
+  <main class="admin-shell">
+    <section class="admin-hero">
+      <div>
+        <div class="eyebrow">CENTRAL ADMINISTRATIVA</div>
+        <h1>Clientes e licenças</h1>
+        <p>Altere vencimentos e adicione dias sem entrar no banco de dados.</p>
+      </div>
+      <div class="admin-badge">ACESSO RESTRITO</div>
+    </section>
+
+    <section class="admin-toolbar">
+      <div class="search-wrap">
+        <input id="searchInput" type="search" placeholder="Buscar por e-mail..." autocomplete="off">
+        <button id="searchBtn" class="btn primary">Buscar</button>
+      </div>
+      <button id="refreshBtn" class="btn ghost">Atualizar</button>
+    </section>
+
+    <div id="msg" class="admin-msg"></div>
+
+    <section class="admin-summary">
+      <div class="summary-card">
+        <span>CLIENTES CARREGADOS</span>
+        <strong id="totalClients">0</strong>
+      </div>
+      <div class="summary-card">
+        <span>LICENÇAS ATIVAS</span>
+        <strong id="activeClients">0</strong>
+      </div>
+      <div class="summary-card">
+        <span>EXPIRADAS</span>
+        <strong id="expiredClients">0</strong>
+      </div>
+    </section>
+
+    <section class="admin-panel">
+      <div class="panel-head">
+        <div>
+          <div class="eyebrow">USUÁRIOS</div>
+          <h2>Gerenciar vencimento</h2>
+        </div>
+      </div>
+
+      <div id="clientsList" class="clients-list">
+        <div class="admin-empty">Carregando clientes...</div>
+      </div>
+    </section>
+  </main>
+
+  <div id="editModal" class="admin-modal" aria-hidden="true">
+    <div class="admin-backdrop" data-close-modal></div>
+    <div class="admin-modal-card">
+      <button class="admin-close" data-close-modal aria-label="Fechar">×</button>
+      <div class="eyebrow">ALTERAR LICENÇA</div>
+      <h2 id="modalEmail">Cliente</h2>
+
+      <div class="modal-current">
+        <span>Validade atual</span>
+        <strong id="modalCurrentExpiry">—</strong>
+      </div>
+
+      <label class="admin-label" for="expiryInput">Nova data e hora de vencimento</label>
+      <input id="expiryInput" class="admin-input" type="datetime-local">
+
+      <button id="saveExpiryBtn" class="btn primary full-admin-btn">Salvar nova validade</button>
+
+      <div class="quick-title">Adicionar tempo rapidamente</div>
+      <div class="quick-grid">
+        <button class="btn ghost quick-days" data-days="1">+ 1 dia</button>
+        <button class="btn ghost quick-days" data-days="7">+ 7 dias</button>
+        <button class="btn ghost quick-days" data-days="30">+ 30 dias</button>
+      </div>
+
+      <div id="modalMsg" class="admin-msg"></div>
+    </div>
+  </div>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
