@@ -1,4 +1,4 @@
-import { supabase } from './supabase.js';
+import { supabase } from './supabase-client.js';
 const form=document.querySelector('#form'),msg=document.querySelector('#msg');
 form.addEventListener('submit',async e=>{
   e.preventDefault();
