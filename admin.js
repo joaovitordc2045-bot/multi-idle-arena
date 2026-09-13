@@ -98,6 +98,9 @@ function renderClients(clients) {
   els.clientsList.innerHTML = clients.map((client) => {
     const expires = client.expires_at ? new Date(client.expires_at) : null;
     const active = client.status === 'active' && expires && expires > new Date();
+    const trialBlocked = client.display_status === 'trial_blocked';
+    const statusClass = trialBlocked ? 'trial-blocked' : (active ? 'active' : 'expired');
+    const statusLabel = trialBlocked ? 'TRIAL BLOQUEADO' : (active ? 'ATIVO' : 'EXPIRADO');
     const plan = planLabel(client.plan);
     const expiry = expires && !Number.isNaN(expires.getTime())
       ? expires.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
@@ -123,8 +126,8 @@ function renderClients(clients) {
           <strong>${escapeHtml(expiry)}</strong>
         </div>
 
-        <div class="client-status ${active ? 'active' : 'expired'}">
-          ${active ? 'ATIVO' : 'EXPIRADO'}
+        <div class="client-status ${statusClass}">
+          ${statusLabel}
         </div>
 
         <button class="btn primary manage-client"
