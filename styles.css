@@ -20,3 +20,7 @@ body.modal-open{overflow:hidden}.site-modal{position:fixed;inset:0;z-index:1000;
 
 .launcher-meta{margin-top:8px!important;color:#777f91!important;font-size:12px}
 .launcher-download-btn{text-decoration:none;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center}
+
+.real-preview{padding:10px}
+.real-preview img{display:block;width:100%;height:auto;border-radius:14px;border:1px solid #303544;background:#090b10}
+@media(max-width:640px){.real-preview{padding:7px}.real-preview img{border-radius:10px}}

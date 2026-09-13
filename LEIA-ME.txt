@@ -1,19 +1,12 @@
-MULTI IDLE ARENA - SITE INICIAL
+CORREÇÃO V4
 
-Arquivos principais:
-- index.html      = site oficial
-- cadastro.html   = cadastro no Supabase
-- login.html      = login
-- conta.html      = área do cliente/licença
-- config.js       = URL + publishable key do Supabase
+Envie TODOS estes arquivos para a RAIZ do repositório multi-idle-arena e substitua os existentes.
 
-Teste local:
-Como os arquivos usam JavaScript modules, abra a pasta com um servidor HTTP local.
-Exemplo com Python:
-  python -m http.server 8080
-Depois abra:
-  http://localhost:8080
+Corrige:
+1. Logo quebrado sem depender da pasta assets.
+2. Home reconhece quem já está logado: mostra "Minha conta" em vez de "Entrar".
+3. Botão principal vira "Ir para Minha Conta" quando a sessão já existe.
+4. A prévia genérica foi substituída pela imagem real mais recente do launcher.
+5. Mantém o botão oficial de download da versão anterior.
 
-Supabase:
-O cadastro usa Auth e o trigger já criado no banco gera profile + Trial de 8 horas.
-Os planos ainda não cobram; Mercado Pago entra na próxima fase.
+Depois do Commit changes, aguarde o GitHub Pages atualizar e pressione Ctrl+F5.
