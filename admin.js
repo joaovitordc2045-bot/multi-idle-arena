@@ -72,7 +72,7 @@ await loadClients('');
 async function loadClients(search = '') {
   setMessage('Carregando clientes...', '');
 
-  const { data, error } = await supabase.rpc('admin_list_clients', {
+  const { data, error } = await supabase.rpc('admin_list_clients_v2', {
     p_search: search || null,
   });
 
@@ -97,14 +97,18 @@ function renderClients(clients) {
 
   els.clientsList.innerHTML = clients.map((client) => {
     const expires = client.expires_at ? new Date(client.expires_at) : null;
-    const active = client.status === 'active' && expires && expires > new Date();
-    const trialBlocked = client.display_status === 'trial_blocked';
-    const statusClass = trialBlocked ? 'trial-blocked' : (active ? 'active' : 'expired');
-    const statusLabel = trialBlocked ? 'TRIAL BLOQUEADO' : (active ? 'ATIVO' : 'EXPIRADO');
+    const trialState = client.trial_state || inferLegacyTrialState(client);
+    const statusInfo = clientStatusInfo(trialState);
     const plan = planLabel(client.plan);
-    const expiry = expires && !Number.isNaN(expires.getTime())
+
+    let expiry = expires && !Number.isNaN(expires.getTime())
       ? expires.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
       : 'Sem validade';
+
+    if (trialState === 'awaiting_activation') expiry = 'Aguardando 1º acesso';
+    if (trialState === 'trial_blocked') expiry = 'Trial não liberado';
+
+    const statusTitle = client.last_trial_message || statusInfo.help;
 
     return `
       <article class="client-row">
@@ -126,8 +130,8 @@ function renderClients(clients) {
           <strong>${escapeHtml(expiry)}</strong>
         </div>
 
-        <div class="client-status ${statusClass}">
-          ${statusLabel}
+        <div class="client-status ${escapeAttr(statusInfo.className)}" title="${escapeAttr(statusTitle)}">
+          ${escapeHtml(statusInfo.label)}
         </div>
 
         <button class="btn primary manage-client"
@@ -155,16 +159,68 @@ function renderClients(clients) {
   });
 }
 
+function inferLegacyTrialState(client) {
+  const expiry = client.expires_at ? new Date(client.expires_at).getTime() : 0;
+  const start = client.starts_at ? new Date(client.starts_at).getTime() : 0;
+  const active = client.status === 'active' && expiry > Date.now();
+
+  if (client.status === 'blocked') return 'blocked';
+  if (active) return 'active';
+  if (String(client.plan || '').toLowerCase() === 'trial' && start && expiry && Math.abs(expiry - start) < 1500) {
+    return 'awaiting_activation';
+  }
+  return 'expired';
+}
+
+function clientStatusInfo(state) {
+  return {
+    active: {
+      label: 'ATIVO',
+      className: 'active',
+      help: 'Licença ativa.'
+    },
+    awaiting_activation: {
+      label: 'AGUARDANDO ATIVAÇÃO',
+      className: 'waiting',
+      help: 'Conta criada. O Trial será validado no primeiro acesso pelo launcher.'
+    },
+    trial_blocked: {
+      label: 'TRIAL BLOQUEADO',
+      className: 'blocked',
+      help: 'O computador já utilizou o período gratuito em outra conta.'
+    },
+    blocked: {
+      label: 'BLOQUEADO',
+      className: 'blocked',
+      help: 'Licença bloqueada.'
+    },
+    expired: {
+      label: 'EXPIRADO',
+      className: 'expired',
+      help: 'A validade terminou.'
+    }
+  }[state] || {
+    label: 'EXPIRADO',
+    className: 'expired',
+    help: 'Licença sem validade ativa.'
+  };
+}
+
 function updateSummary(clients) {
-  const now = Date.now();
-  const active = clients.filter((client) => {
-    const expiry = client.expires_at ? new Date(client.expires_at).getTime() : 0;
-    return client.status === 'active' && expiry > now;
-  }).length;
+  const states = clients.map((client) => client.trial_state || inferLegacyTrialState(client));
+  const active = states.filter((state) => state === 'active').length;
+  const waiting = states.filter((state) => state === 'awaiting_activation').length;
+  const blocked = states.filter((state) => state === 'trial_blocked' || state === 'blocked').length;
+  const expired = states.filter((state) => state === 'expired').length;
 
   els.totalClients.textContent = String(clients.length);
   els.activeClients.textContent = String(active);
-  els.expiredClients.textContent = String(clients.length - active);
+  els.expiredClients.textContent = String(expired);
+
+  const waitingEl = document.querySelector('#waitingClients');
+  const blockedEl = document.querySelector('#blockedClients');
+  if (waitingEl) waitingEl.textContent = String(waiting);
+  if (blockedEl) blockedEl.textContent = String(blocked);
 }
 
 function openModal() {
