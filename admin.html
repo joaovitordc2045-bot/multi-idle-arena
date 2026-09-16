@@ -11,6 +11,32 @@
   <style>
     .client-status.waiting { color:#f2bd5a; border-color:rgba(242,189,90,.38); background:rgba(242,189,90,.08); }
     .client-status.blocked { color:#ff7287; border-color:rgba(255,114,135,.42); background:rgba(255,114,135,.09); }
+
+    .admin-tabs{display:flex;gap:10px;margin:18px 0 16px;flex-wrap:wrap}
+    .admin-tab{border:1px solid rgba(117,143,177,.28);background:#111d2b;color:#aebed1;border-radius:10px;padding:11px 16px;font-weight:800;cursor:pointer}
+    .admin-tab.active{background:linear-gradient(135deg,#b51f45,#e32f59);border-color:#ef4168;color:#fff;box-shadow:0 8px 24px rgba(214,35,78,.18)}
+    .admin-view[hidden]{display:none!important}
+    .bug-toolbar{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap}
+    .bug-filters{display:flex;gap:8px;flex-wrap:wrap}
+    .bug-filter{border:1px solid rgba(117,143,177,.25);background:#101b29;color:#aebed1;border-radius:999px;padding:8px 13px;font-weight:800;cursor:pointer}
+    .bug-filter.active{color:#fff;border-color:#d52b51;background:rgba(213,43,81,.16)}
+    .bug-list{display:grid;gap:12px}
+    .bug-card{border:1px solid rgba(117,143,177,.22);background:rgba(10,20,31,.78);border-radius:14px;padding:16px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px}
+    .bug-top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:9px}
+    .bug-category{font-size:12px;font-weight:900;color:#d9e5f3;background:#17283a;border:1px solid rgba(117,143,177,.25);border-radius:999px;padding:5px 9px}
+    .bug-date{font-size:12px;color:#7f94aa}
+    .bug-description{font-size:14px;color:#eef4fb;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+    .bug-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .bug-meta span{font-size:11px;color:#91a6bb;background:#0c1723;border:1px solid rgba(117,143,177,.16);border-radius:7px;padding:5px 7px}
+    .bug-actions{min-width:170px;display:flex;flex-direction:column;gap:8px}
+    .bug-status-select{width:100%;border:1px solid rgba(117,143,177,.3);background:#101c2a;color:#eef4fb;border-radius:9px;padding:9px 10px;font-weight:800}
+    .bug-status{font-size:11px;font-weight:900;text-align:center;border-radius:999px;padding:6px 9px}
+    .bug-status.novo{color:#65e7ad;background:rgba(42,201,139,.10);border:1px solid rgba(42,201,139,.28)}
+    .bug-status.em_analise{color:#ffd16a;background:rgba(255,193,67,.10);border:1px solid rgba(255,193,67,.28)}
+    .bug-status.resolvido{color:#87a7c8;background:rgba(115,145,177,.10);border:1px solid rgba(115,145,177,.25)}
+    .bug-count{display:inline-flex;min-width:22px;height:22px;align-items:center;justify-content:center;border-radius:999px;background:#d52b51;color:#fff;font-size:11px;margin-left:6px}
+    @media(max-width:800px){.bug-card{grid-template-columns:1fr}.bug-actions{min-width:0}}
+
   </style>
 </head>
 <body>
@@ -37,6 +63,12 @@
       <div class="admin-badge">ACESSO RESTRITO</div>
     </section>
 
+    <div class="admin-tabs">
+      <button id="clientsTab" class="admin-tab active" type="button">Clientes e licenças</button>
+      <button id="bugsTab" class="admin-tab" type="button">Relatórios de Bugs <span id="newBugCount" class="bug-count">0</span></button>
+    </div>
+
+    <div id="clientsView" class="admin-view">
     <section class="admin-toolbar">
       <div class="search-wrap">
         <input id="searchInput" type="search" placeholder="Buscar por e-mail..." autocomplete="off">
@@ -82,6 +114,34 @@
         <div class="admin-empty">Carregando clientes...</div>
       </div>
     </section>
+    </div>
+
+    <div id="bugsView" class="admin-view" hidden>
+      <section class="admin-panel">
+        <div class="panel-head">
+          <div>
+            <div class="eyebrow">SUPORTE</div>
+            <h2>Relatórios de Bugs</h2>
+            <p>Chamados enviados diretamente pelo Multi Idle Arena.</p>
+          </div>
+          <button id="refreshBugsBtn" class="btn ghost" type="button">Atualizar relatórios</button>
+        </div>
+
+        <div class="bug-toolbar">
+          <div class="bug-filters">
+            <button class="bug-filter active" data-bug-filter="todos" type="button">Todos</button>
+            <button class="bug-filter" data-bug-filter="novo" type="button">Novos</button>
+            <button class="bug-filter" data-bug-filter="em_analise" type="button">Em análise</button>
+            <button class="bug-filter" data-bug-filter="resolvido" type="button">Resolvidos</button>
+          </div>
+          <div id="bugMsg" class="admin-msg"></div>
+        </div>
+
+        <div id="bugReportsList" class="bug-list">
+          <div class="admin-empty">Abra esta seção para carregar os relatórios.</div>
+        </div>
+      </section>
+    </div>
   </main>
 
   <div id="editModal" class="admin-modal" aria-hidden="true">

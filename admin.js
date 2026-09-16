@@ -18,9 +18,19 @@ const els = {
   expiryInput: document.querySelector('#expiryInput'),
   saveExpiryBtn: document.querySelector('#saveExpiryBtn'),
   modalMsg: document.querySelector('#modalMsg'),
+  clientsTab: document.querySelector('#clientsTab'),
+  bugsTab: document.querySelector('#bugsTab'),
+  clientsView: document.querySelector('#clientsView'),
+  bugsView: document.querySelector('#bugsView'),
+  bugReportsList: document.querySelector('#bugReportsList'),
+  refreshBugsBtn: document.querySelector('#refreshBugsBtn'),
+  bugMsg: document.querySelector('#bugMsg'),
+  newBugCount: document.querySelector('#newBugCount'),
 };
 
 let selectedClient = null;
+let bugReports = [];
+let bugFilter = 'todos';
 
 const { data: sessionData } = await supabase.auth.getSession();
 const session = sessionData.session;
@@ -66,6 +76,19 @@ document.querySelectorAll('.quick-days').forEach((button) => {
 });
 
 els.saveExpiryBtn.onclick = saveExpiry;
+
+
+els.clientsTab?.addEventListener('click', () => switchAdminView('clients'));
+els.bugsTab?.addEventListener('click', () => switchAdminView('bugs'));
+els.refreshBugsBtn?.addEventListener('click', loadBugReports);
+
+document.querySelectorAll('[data-bug-filter]').forEach((button) => {
+  button.addEventListener('click', () => {
+    bugFilter = button.dataset.bugFilter || 'todos';
+    document.querySelectorAll('[data-bug-filter]').forEach((item) => item.classList.toggle('active', item === button));
+    renderBugReports();
+  });
+});
 
 await loadClients('');
 
@@ -346,6 +369,154 @@ async function addDays(days) {
 
   setModalMessage(`+${days} dia${days > 1 ? 's' : ''} adicionado com sucesso.`, 'ok');
   await loadClients(els.searchInput.value.trim());
+}
+
+
+async function switchAdminView(view) {
+  const bugs = view === 'bugs';
+  els.clientsView.hidden = bugs;
+  els.bugsView.hidden = !bugs;
+  els.clientsTab.classList.toggle('active', !bugs);
+  els.bugsTab.classList.toggle('active', bugs);
+
+  if (bugs) await loadBugReports();
+}
+
+async function loadBugReports() {
+  setBugMessage('Carregando relatórios...', '');
+
+  const { data, error } = await supabase
+    .from('bug_reports')
+    .select('id,category,description,app_version,electron_version,platform,os_version,total_ram_gb,process_count,workspace,layout,session_count,status,created_at,updated_at')
+    .order('created_at', { ascending: false })
+    .limit(200);
+
+  if (error) {
+    console.error(error);
+    setBugMessage('Não foi possível carregar os relatórios. Verifique a permissão de leitura do Admin.', 'error');
+    els.bugReportsList.innerHTML = '<div class="admin-empty">Erro ao carregar relatórios.</div>';
+    return;
+  }
+
+  bugReports = Array.isArray(data) ? data : [];
+  renderBugReports();
+  updateBugBadge();
+  setBugMessage('', '');
+}
+
+function renderBugReports() {
+  const reports = bugFilter === 'todos'
+    ? bugReports
+    : bugReports.filter((report) => report.status === bugFilter);
+
+  if (!reports.length) {
+    els.bugReportsList.innerHTML = '<div class="admin-empty">Nenhum relatório nesta categoria.</div>';
+    return;
+  }
+
+  els.bugReportsList.innerHTML = reports.map((report) => {
+    const created = report.created_at ? new Date(report.created_at) : null;
+    const dateLabel = created && !Number.isNaN(created.getTime())
+      ? created.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
+      : 'Data indisponível';
+
+    const status = ['novo','em_analise','resolvido'].includes(report.status) ? report.status : 'novo';
+
+    const meta = [
+      report.app_version ? `App ${report.app_version}` : '',
+      report.electron_version ? `Electron ${report.electron_version}` : '',
+      report.os_version || report.platform || '',
+      report.total_ram_gb != null ? `${report.total_ram_gb} GB RAM` : '',
+      report.process_count != null ? `${report.process_count} proc.` : '',
+      report.session_count != null ? `${report.session_count} sessões` : '',
+      report.workspace ? `Workspace: ${report.workspace}` : '',
+      report.layout ? `Layout: ${report.layout}` : '',
+    ].filter(Boolean);
+
+    return `
+      <article class="bug-card">
+        <div>
+          <div class="bug-top">
+            <span class="bug-category">${escapeHtml(bugCategoryLabel(report.category))}</span>
+            <span class="bug-date">${escapeHtml(dateLabel)}</span>
+            <span class="bug-status ${escapeAttr(status)}">${escapeHtml(bugStatusLabel(status))}</span>
+          </div>
+          <div class="bug-description">${escapeHtml(report.description || 'Sem descrição')}</div>
+          <div class="bug-meta">${meta.map((item) => `<span>${escapeHtml(item)}</span>`).join('')}</div>
+        </div>
+        <div class="bug-actions">
+          <label class="admin-label" for="bug-${escapeAttr(report.id)}">Status</label>
+          <select id="bug-${escapeAttr(report.id)}" class="bug-status-select" data-bug-id="${escapeAttr(report.id)}">
+            <option value="novo" ${status === 'novo' ? 'selected' : ''}>Novo</option>
+            <option value="em_analise" ${status === 'em_analise' ? 'selected' : ''}>Em análise</option>
+            <option value="resolvido" ${status === 'resolvido' ? 'selected' : ''}>Resolvido</option>
+          </select>
+        </div>
+      </article>`;
+  }).join('');
+
+  document.querySelectorAll('[data-bug-id]').forEach((select) => {
+    select.addEventListener('change', () => updateBugStatus(select.dataset.bugId, select.value, select));
+  });
+}
+
+async function updateBugStatus(id, status, select) {
+  if (!id || !['novo','em_analise','resolvido'].includes(status)) return;
+
+  select.disabled = true;
+  setBugMessage('Atualizando chamado...', '');
+
+  const { error } = await supabase
+    .from('bug_reports')
+    .update({ status, updated_at: new Date().toISOString() })
+    .eq('id', id);
+
+  select.disabled = false;
+
+  if (error) {
+    console.error(error);
+    setBugMessage('Não foi possível alterar o status.', 'error');
+    await loadBugReports();
+    return;
+  }
+
+  const report = bugReports.find((item) => item.id === id);
+  if (report) report.status = status;
+  updateBugBadge();
+  renderBugReports();
+  setBugMessage('Status atualizado.', 'ok');
+}
+
+function updateBugBadge() {
+  const total = bugReports.filter((report) => report.status === 'novo').length;
+  els.newBugCount.textContent = String(total);
+  els.newBugCount.style.display = total ? 'inline-flex' : 'none';
+}
+
+function bugCategoryLabel(category) {
+  return {
+    bug: 'Bug',
+    crash: 'Erro / travamento',
+    performance: 'Desempenho',
+    visual: 'Problema visual',
+    account: 'Conta / sessão',
+    update: 'Atualização',
+    other: 'Outro',
+  }[String(category || '').toLowerCase()] || String(category || 'Bug');
+}
+
+function bugStatusLabel(status) {
+  return {
+    novo: 'NOVO',
+    em_analise: 'EM ANÁLISE',
+    resolvido: 'RESOLVIDO',
+  }[status] || 'NOVO';
+}
+
+function setBugMessage(text, type = '') {
+  if (!els.bugMsg) return;
+  els.bugMsg.className = `admin-msg ${type}`.trim();
+  els.bugMsg.textContent = text;
 }
 
 function planLabel(plan) {
