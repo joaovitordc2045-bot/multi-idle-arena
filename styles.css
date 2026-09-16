@@ -72,3 +72,18 @@ body.modal-open{overflow:hidden}.site-modal{position:fixed;inset:0;z-index:1000;
  .pricing-grid{grid-template-columns:1fr}.final-cta{margin:30px 20px 60px;padding:28px 0;grid-template-columns:50px 1fr}.final-cta img{width:44px}.final-cta .btn{grid-column:1/3;width:100%}
  .home-footer{grid-template-columns:1fr;text-align:center}.footer-brand,.footer-links{justify-content:center}
 }
+
+/* vLifetime — legibilidade e licença vitalícia */
+.account-dashboard .muted, .account-dashboard p { font-size: 16px; line-height: 1.6; }
+.account-dashboard .metric-label { font-size: 13px; letter-spacing: .08em; }
+.account-dashboard .license-plan { font-size: 30px; }
+.account-dashboard .status-big { font-size: 26px; }
+.account-dashboard .btn { font-size: 15px; min-height: 44px; }
+.lifetime-plans { grid-template-columns: minmax(320px, 620px) !important; justify-content: center; }
+.lifetime-card { padding: 28px !important; }
+.lifetime-card h3 { font-size: 28px; margin: 10px 0; }
+.lifetime-card .price { font-size: 42px; }
+.lifetime-card .price small { font-size: 15px; }
+.lifetime-card p { font-size: 17px; }
+.pix-site-card h2 { font-size: 28px; }
+.pix-site-card .muted, .pix-copy-label, .pix-status { font-size: 15px; }

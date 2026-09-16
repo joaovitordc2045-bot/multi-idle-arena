@@ -33,13 +33,15 @@ const els = {
 };
 
 const PLAN = {
-  trial: { name: 'Período gratuito', tag: 'TRIAL' },
-  daily: { name: 'Diário', tag: '1 DIA' },
-  weekly: { name: 'Semanal', tag: '7 DIAS' },
-  monthly: { name: 'Mensal', tag: '30 DIAS' },
+  trial: { name: 'Teste gratuito', tag: 'TRIAL 8H' },
+  lifetime: { name: 'Licença vitalícia', tag: 'VITALÍCIO' },
+  daily: { name: 'Diário (legado)', tag: 'LEGADO' },
+  weekly: { name: 'Semanal (legado)', tag: 'LEGADO' },
+  monthly: { name: 'Mensal (legado)', tag: 'LEGADO' },
+  manual: { name: 'Manual/Admin', tag: 'ADMIN' },
 };
 
-const PRICE = { daily: 3, weekly: 12, monthly: 18 };
+const PRICE = { lifetime: 19 };
 let session = null;
 let currentLicense = null;
 let paymentPoll = null;
@@ -133,33 +135,50 @@ async function loadLicense(showToast = false) {
 }
 
 function renderLicense(data) {
-  const plan = PLAN[data.plan] || { name: data.plan || '—', tag: 'PLANO' };
+  const plan = PLAN[data.plan] || { name: data.plan || '—', tag: 'LICENÇA' };
   const expires = data.expires_at ? new Date(data.expires_at) : null;
   const now = new Date();
   const validDate = expires && !Number.isNaN(expires.getTime());
-  const active = data.status === 'active' && validDate && expires > now;
+  const isLifetime = data.plan === 'lifetime' && data.status === 'active';
   const isTrial = data.plan === 'trial';
+  const active = isLifetime || (data.status === 'active' && validDate && expires > now);
 
   els.plan.textContent = plan.name;
   els.planTag.textContent = plan.tag;
-  els.expiresAt.textContent = validDate
-    ? expires.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
-    : '—';
-  els.remaining.textContent = validDate ? formatRemaining(expires - now) : '—';
+
+  if (isLifetime) {
+    els.expiresAt.textContent = 'Vitalícia · não expira';
+    els.remaining.textContent = 'Para sempre';
+  } else {
+    els.expiresAt.textContent = validDate
+      ? expires.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
+      : '—';
+    els.remaining.textContent = validDate ? formatRemaining(expires - now) : '—';
+  }
+
   els.status.textContent = active ? 'ATIVO' : 'EXPIRADO';
   els.status.className = `status-big ${active ? 'active' : 'expired'}`;
-
   els.licenseBadge.className = `license-badge ${active ? 'active' : 'expired'}`;
-  els.licenseBadgeText.textContent = active
-    ? (isTrial ? 'Trial ativo' : 'Licença ativa')
-    : 'Licença expirada';
+  els.licenseBadgeText.textContent = isLifetime
+    ? 'Licença vitalícia'
+    : active && isTrial ? 'Trial 8h ativo' : active ? 'Licença ativa' : 'Acesso expirado';
 
-  if (active && isTrial) {
-    els.statusDescription.textContent = 'Seu período gratuito está ativo. Você pode renovar a qualquer momento sem perder o tempo restante.';
-  } else if (active) {
-    els.statusDescription.textContent = 'Sua licença está ativa e pronta para uso no launcher.';
+  const plansSection = document.querySelector('#plansSection');
+  if (isLifetime) {
+    els.statusDescription.textContent = 'Sua licença é vitalícia. Não há mensalidade, renovação ou data de vencimento.';
+    els.renewBtn.textContent = 'Licença vitalícia ativa';
+    els.renewBtn.disabled = true;
+    if (plansSection) plansSection.hidden = true;
+  } else if (active && isTrial) {
+    els.statusDescription.textContent = 'Seu teste gratuito de 8 horas está ativo. Compre o vitalício uma única vez por R$ 19.';
+    els.renewBtn.textContent = 'Comprar vitalício · R$ 19';
+    els.renewBtn.disabled = false;
+    if (plansSection) plansSection.hidden = false;
   } else {
-    els.statusDescription.textContent = 'Sua licença venceu. Escolha um plano abaixo para reativar o acesso.';
+    els.statusDescription.textContent = 'Seu teste terminou. Compre a licença vitalícia por R$ 19 para liberar o acesso permanentemente.';
+    els.renewBtn.textContent = 'Comprar vitalício · R$ 19';
+    els.renewBtn.disabled = false;
+    if (plansSection) plansSection.hidden = false;
   }
 }
 
@@ -303,14 +322,7 @@ async function checkPaymentState(manual = false) {
   const license = await loadLicense(false);
   if (!license) return;
 
-  const after = license.expires_at
-    ? new Date(license.expires_at).getTime()
-    : 0;
-
-  if (
-    pendingPixBaselineExpiresAt > 0 &&
-    after > pendingPixBaselineExpiresAt
-  ) {
+  if (license.plan === 'lifetime' && license.status === 'active') {
     await finishApprovedPix();
     return;
   }
@@ -325,7 +337,7 @@ async function checkPaymentState(manual = false) {
 async function finishApprovedPix() {
   els.pixStatus.className = 'pix-status approved';
   els.pixStatus.innerHTML =
-    '<span class="approved-check">✓</span><span>Pagamento aprovado · licença ativada</span>';
+    '<span class="approved-check">✓</span><span>Pagamento aprovado · licença vitalícia ativada</span>';
 
   stopPaymentPolling();
 

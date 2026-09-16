@@ -91,6 +91,8 @@ document.querySelectorAll('[data-bug-filter]').forEach((button) => {
 });
 
 await loadClients('');
+// Carrega a contagem de reports sem trocar de aba.
+await preloadBugCount();
 
 async function loadClients(search = '') {
   setMessage('Carregando clientes...', '');
@@ -374,12 +376,40 @@ async function addDays(days) {
 
 async function switchAdminView(view) {
   const bugs = view === 'bugs';
-  els.clientsView.hidden = bugs;
-  els.bugsView.hidden = !bugs;
-  els.clientsTab.classList.toggle('active', !bugs);
-  els.bugsTab.classList.toggle('active', bugs);
+
+  if (els.clientsView) {
+    els.clientsView.hidden = bugs;
+    els.clientsView.style.display = bugs ? 'none' : '';
+  }
+  if (els.bugsView) {
+    els.bugsView.hidden = !bugs;
+    els.bugsView.style.display = bugs ? '' : 'none';
+  }
+  els.clientsTab?.classList.toggle('active', !bugs);
+  els.bugsTab?.classList.toggle('active', bugs);
 
   if (bugs) await loadBugReports();
+}
+
+window.miaAdminShowView = switchAdminView;
+
+async function preloadBugCount() {
+  const { data, error } = await supabase
+    .from('bug_reports')
+    .select('id,status')
+    .eq('status', 'novo')
+    .limit(200);
+
+  if (error) {
+    console.warn('Não foi possível pré-carregar a contagem de bugs:', error);
+    return;
+  }
+
+  const total = Array.isArray(data) ? data.length : 0;
+  if (els.newBugCount) {
+    els.newBugCount.textContent = String(total);
+    els.newBugCount.style.display = total ? 'inline-flex' : 'none';
+  }
 }
 
 async function loadBugReports() {

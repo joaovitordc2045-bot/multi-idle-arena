@@ -64,8 +64,8 @@
     </section>
 
     <div class="admin-tabs">
-      <button id="clientsTab" class="admin-tab active" type="button">Clientes e licenças</button>
-      <button id="bugsTab" class="admin-tab" type="button">Relatórios de Bugs <span id="newBugCount" class="bug-count">0</span></button>
+      <button id="clientsTab" class="admin-tab active" type="button" onclick="window.miaAdminShowView && window.miaAdminShowView('clients')">Clientes e licenças</button>
+      <button id="bugsTab" class="admin-tab" type="button" onclick="window.miaAdminShowView && window.miaAdminShowView('bugs')">Relatórios de Bugs <span id="newBugCount" class="bug-count">0</span></button>
     </div>
 
     <div id="clientsView" class="admin-view">
