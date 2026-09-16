@@ -1,0 +1,20 @@
+MULTI IDLE ARENA — TRIAL 8H + VITALÍCIO R$ 19
+
+O que já foi alterado neste pacote:
+- Minha Conta: remove Diário/Semanal/Mensal da venda.
+- Nova oferta única: Licença Vitalícia R$ 19.
+- Conta reconhece plan=lifetime como ativa sem vencimento.
+- Histórico continua aceitando planos antigos.
+- SQL adiciona lifetime ao banco.
+- Edge Functions de referência incluídas para create-pix e webhook.
+
+ORDEM:
+1) Execute SQL_LIFETIME_R19.sql no Supabase.
+2) Atualize/deploy as duas Edge Functions usando os arquivos em supabase-functions.
+3) Publique os arquivos do site.
+4) Faça um Pix real/teste e confirme que licenses.plan vira lifetime e expires_at vira NULL.
+
+ATENÇÃO:
+O ZIP do site enviado não contém as Edge Functions atualmente implantadas no Supabase.
+Por isso elas foram incluídas separadamente aqui e precisam ser publicadas no Supabase.
+Não coloque SERVICE_ROLE_KEY no site ou no launcher.
