@@ -16,6 +16,10 @@
     .admin-tab{border:1px solid rgba(117,143,177,.28);background:#111d2b;color:#aebed1;border-radius:10px;padding:11px 16px;font-weight:800;cursor:pointer}
     .admin-tab.active{background:linear-gradient(135deg,#b51f45,#e32f59);border-color:#ef4168;color:#fff;box-shadow:0 8px 24px rgba(214,35,78,.18)}
     .admin-view[hidden]{display:none!important}
+    .summary-card.online-card{border-color:rgba(53,211,139,.32);background:linear-gradient(180deg,rgba(53,211,139,.08),rgba(10,20,31,.72))}
+    .summary-card.online-card strong{color:#65e7ad}
+    .online-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#42d994;margin-right:7px;box-shadow:0 0 10px rgba(66,217,148,.55)}
+    .client-online{display:inline-flex;align-items:center;color:#65e7ad;font-size:11px;font-weight:900;margin-top:4px}
     .bug-toolbar{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap}
     .bug-filters{display:flex;gap:8px;flex-wrap:wrap}
     .bug-filter{border:1px solid rgba(117,143,177,.25);background:#101b29;color:#aebed1;border-radius:999px;padding:8px 13px;font-weight:800;cursor:pointer}
@@ -80,6 +84,10 @@
     <div id="msg" class="admin-msg"></div>
 
     <section class="admin-summary">
+      <div class="summary-card online-card">
+        <span><i class="online-dot"></i>ONLINE AGORA</span>
+        <strong id="onlineClients">0</strong>
+      </div>
       <div class="summary-card">
         <span>CLIENTES CARREGADOS</span>
         <strong id="totalClients">0</strong>

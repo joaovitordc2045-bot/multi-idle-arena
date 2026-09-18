@@ -7,6 +7,7 @@ const els = {
   refreshBtn: document.querySelector('#refreshBtn'),
   clientsList: document.querySelector('#clientsList'),
   totalClients: document.querySelector('#totalClients'),
+  onlineClients: document.querySelector('#onlineClients'),
   activeClients: document.querySelector('#activeClients'),
   expiredClients: document.querySelector('#expiredClients'),
   msg: document.querySelector('#msg'),
@@ -31,6 +32,8 @@ const els = {
 let selectedClient = null;
 let bugReports = [];
 let bugFilter = 'todos';
+let onlineUsers = new Map();
+let onlineRefreshTimer = null;
 
 const { data: sessionData } = await supabase.auth.getSession();
 const session = sessionData.session;
@@ -61,7 +64,7 @@ els.logout.onclick = async () => {
 };
 
 els.searchBtn.onclick = () => loadClients(els.searchInput.value.trim());
-els.refreshBtn.onclick = () => loadClients(els.searchInput.value.trim());
+els.refreshBtn.onclick = async () => { await loadOnlineUsers(); await loadClients(els.searchInput.value.trim()); };
 
 els.searchInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') loadClients(els.searchInput.value.trim());
@@ -90,9 +93,47 @@ document.querySelectorAll('[data-bug-filter]').forEach((button) => {
   });
 });
 
+await loadOnlineUsers();
 await loadClients('');
+onlineRefreshTimer = setInterval(loadOnlineUsers, 30000);
 // Carrega a contagem de reports sem trocar de aba.
 await preloadBugCount();
+
+
+async function loadOnlineUsers() {
+  const { data, error } = await supabase.rpc('admin_online_users');
+
+  if (error) {
+    console.warn('Não foi possível carregar usuários online:', error);
+    return;
+  }
+
+  const rows = Array.isArray(data) ? data : [];
+  onlineUsers = new Map(rows.map((row) => [row.user_id, row]));
+
+  if (els.onlineClients) {
+    els.onlineClients.textContent = String(onlineUsers.size);
+  }
+
+  // Atualiza os indicadores na lista sem precisar refazer a consulta de clientes.
+  document.querySelectorAll('.client-row').forEach((row) => {
+    const userId = row.querySelector('.manage-client')?.dataset.user;
+    const info = row.querySelector('.client-info');
+    if (!userId || !info) return;
+
+    let badge = info.querySelector('.client-online');
+    if (onlineUsers.has(userId)) {
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'client-online';
+        badge.innerHTML = '<i class="online-dot"></i>ONLINE';
+        info.appendChild(badge);
+      }
+    } else if (badge) {
+      badge.remove();
+    }
+  });
+}
 
 async function loadClients(search = '') {
   setMessage('Carregando clientes...', '');
@@ -142,6 +183,7 @@ function renderClients(clients) {
           <div class="client-info">
             <strong>${escapeHtml(client.email || 'Sem e-mail')}</strong>
             <span>ID ${escapeHtml(shortId(client.user_id))}</span>
+            ${onlineUsers.has(client.user_id) ? '<span class="client-online"><i class="online-dot"></i>ONLINE</span>' : ''}
           </div>
         </div>
 
