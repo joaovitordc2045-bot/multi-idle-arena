@@ -1,207 +1,33 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#08090d">
-  <meta name="description" content="Multi Idle Arena: organize múltiplas sessões de jogos de navegador em um único launcher para Windows.">
-  <title>Multi Idle Arena — Multi-sessão para jogos idle</title>
-  <link rel="icon" href="favicon.ico">
-  <link rel="stylesheet" href="styles.css">
-
-<style>
-  .pricing-public{padding:88px 24px}
-  .pricing-public .section-head{max-width:760px;margin:0 auto 34px;text-align:center}
-  .pricing-public .section-head h2{font-size:clamp(32px,4vw,48px);line-height:1.08;margin:10px 0 16px}
-  .pricing-public .section-head p{font-size:18px;line-height:1.65}
-  .pricing-public-grid{max-width:980px;margin:0 auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
-  .pricing-public-card{position:relative;padding:32px;border:1px solid rgba(255,255,255,.10);border-radius:22px;background:rgba(15,17,24,.92)}
-  .pricing-public-card h3{font-size:27px;margin:10px 0 14px}
-  .pricing-public-card p{font-size:17px;line-height:1.6;min-height:55px}
-  .pricing-public-price{font-size:44px;font-weight:800;margin:14px 0}
-  .pricing-public-price small{font-size:15px;font-weight:600;opacity:.72}
-  .pricing-public-card .btn{width:100%;min-height:48px;display:flex;align-items:center;justify-content:center;margin-top:22px;font-size:16px}
-  .pricing-public-featured{border-color:#ff3657;box-shadow:0 0 0 1px rgba(255,54,87,.18),0 24px 70px rgba(0,0,0,.24)}
-  .pricing-public-badge{position:absolute;right:24px;top:24px;padding:7px 10px;border-radius:8px;background:rgba(255,54,87,.14);color:#ff5b74;font-size:12px;font-weight:800;letter-spacing:.08em}
-  @media(max-width:760px){.pricing-public{padding:64px 18px}.pricing-public-grid{grid-template-columns:1fr}.pricing-public-card p{min-height:0}}
-</style>
-
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090b10"><meta name="description" content="Multi Idle Arena: organize múltiplas sessões de jogos de navegador em um único launcher para Windows.">
+<title>Multi Idle Arena — Todas as suas contas em uma única arena</title>
+<link rel="icon" href="favicon.ico"><link rel="stylesheet" href="styles.css">
 </head>
-<body class="home-v2">
-<div class="bg"></div>
-
-<nav class="nav home-nav">
-  <a class="brand" href="/">
-    <img src="arena-logo.png" alt="Multi Idle Arena">
-    <span>MULTI IDLE <em>ARENA</em></span>
-  </a>
-  <div class="home-nav-center">
-    <a href="#recursos">Recursos</a>
-    <a href="#como-funciona">Como funciona</a>
-    <a href="#planos">Planos</a>
-    <a href="#duvidas">Dúvidas</a>
-  </div>
-  <div class="navlinks">
-    <a class="btn ghost hide-sm" href="#download">Download</a>
-    <a class="btn" id="accountNavBtn" href="login.html">Entrar</a>
-    <a class="btn primary" id="signupNavBtn" href="cadastro.html">Criar conta</a>
-  </div>
-</nav>
-
+<body class="home-v3"><div class="bg"></div>
+<nav class="nav home-nav"><a class="brand" href="/"><img src="arena-logo.png" alt="Multi Idle Arena"><span>MULTI IDLE <em>ARENA</em></span></a><div class="home-nav-center"><a href="#recursos">Recursos</a><a href="#como-funciona">Como funciona</a><a href="#planos">Vitalício</a><a href="#duvidas">Dúvidas</a></div><div class="navlinks"><a class="btn ghost hide-sm" href="#download">Download</a><a class="btn" id="accountNavBtn" href="login.html">Entrar</a><a class="btn primary" id="signupNavBtn" href="cadastro.html">Testar grátis</a></div></nav>
 <main>
-  <section class="mia-hero">
-    <div class="hero-copy">
-      <div class="hero-badge"><i></i> LAUNCHER MULTI-SESSÃO PARA WINDOWS</div>
-      <h1>Suas contas.<br><em>Uma única arena.</em></h1>
-      <p>Abra, organize e alterne entre múltiplas sessões de jogos de navegador sem espalhar várias janelas pela área de trabalho.</p>
-      <div class="hero-actions">
-        <a class="btn primary btn-lg" href="https://github.com/joaovitordc2045-bot/multi-idle-arena/releases/latest/download/Multi-Idle-Arena-Setup.exe">↓ Baixar para Windows</a>
-        <a class="btn btn-lg" id="heroAccountBtn" href="cadastro.html">Criar conta / Trial</a>
-      </div>
-      <div class="hero-trust">
-        <span>✓ Download público</span>
-        <span>✓ Sessões independentes</span>
-        <span>✓ Layouts ajustáveis</span>
-      </div>
-    </div>
-
-    <div class="product-stage">
-      <div class="stage-glow"></div>
-      <div class="stage-window">
-        <div class="stage-top">
-          <div class="stage-dots"><i></i><i></i><i></i></div>
-          <span>Multi Idle Arena</span>
-          <b>● ATIVO</b>
-        </div>
-        <img src="launcher-preview.png" alt="Multi Idle Arena em funcionamento com múltiplas sessões">
-      </div>
-      <div class="floating-proof proof-a"><b>SESSÕES</b><strong>Isoladas</strong><small>cookies separados</small></div>
-      <div class="floating-proof proof-b"><b>LAYOUT</b><strong>2×2 + Foco</strong><small>organização rápida</small></div>
-    </div>
-  </section>
-
-  <section class="proof-strip" aria-label="Recursos em destaque">
-    <div><span>◫</span><small>MULTI-SESSÃO</small><strong>Contas organizadas</strong></div>
-    <div><span>◎</span><small>ISOLAMENTO</small><strong>Cookies independentes</strong></div>
-    <div><span>⌁</span><small>CONTROLE</small><strong>Grade + modo foco</strong></div>
-    <div><span>⌁</span><small>DESEMPENHO</small><strong>CPU e RAM monitorados</strong></div>
-  </section>
-
-  <section class="section home-section" id="recursos">
-    <div class="section-kicker">FEITO PARA MULTI-CONTA</div>
-    <div class="section-title-row">
-      <div>
-        <h2>Menos janelas. Mais controle.</h2>
-        <p class="lead">O Multi Idle Arena reúne as sessões em uma interface única e mantém cada conta separada.</p>
-      </div>
-      <span class="section-number">01</span>
-    </div>
-
-    <div class="feature-grid">
-      <article class="feature-card feature-wide">
-        <div class="feature-icon">▦</div>
-        <div><h3>Organização em grade</h3><p>Visualize várias sessões lado a lado e troque rapidamente entre grade e foco.</p></div>
-        <div class="mini-layout"><i></i><i></i><i></i><i></i></div>
-      </article>
-      <article class="feature-card"><div class="feature-icon">◉</div><h3>Sessões independentes</h3><p>Cada conta mantém sua própria sessão e cookies persistentes.</p></article>
-      <article class="feature-card"><div class="feature-icon">↔</div><h3>Troca rápida</h3><p>Selecione uma conta na lateral e leve a sessão desejada para o foco.</p></article>
-      <article class="feature-card"><div class="feature-icon">⌁</div><h3>Monitoramento</h3><p>Acompanhe indicadores de CPU e memória diretamente no launcher.</p></article>
-      <article class="feature-card"><div class="feature-icon">✎</div><h3>Contas identificadas</h3><p>Renomeie suas sessões para reconhecer cada personagem ou conta com facilidade.</p></article>
-    </div>
-  </section>
-
-  <section class="section home-section showcase-section" id="como-funciona">
-    <div class="showcase-copy">
-      <div class="section-kicker">PRODUTO EM FUNCIONAMENTO</div>
-      <h2>Não é só uma promessa.<br>Veja o launcher real.</h2>
-      <p class="lead">A imagem ao lado é uma prévia do próprio Multi Idle Arena, com múltiplas contas organizadas na mesma interface.</p>
-      <div class="check-list">
-        <span><b>01</b> Adicione suas contas</span>
-        <span><b>02</b> Abra as sessões separadamente</span>
-        <span><b>03</b> Organize em grade ou use o modo foco</span>
-      </div>
-    </div>
-    <div class="showcase-shot">
-      <div class="shot-label"><i></i> INTERFACE REAL DO MULTI IDLE ARENA</div>
-      <img src="launcher-preview.png" alt="Interface real do Multi Idle Arena">
-    </div>
-  </section>
-
-  <section class="section home-section confidence-section">
-    <div class="section-kicker">CONFIANÇA SEM NÚMEROS INVENTADOS</div>
-    <h2>Prova social começa com produto real.</h2>
-    <p class="lead">Enquanto a comunidade cresce, mostramos o que já pode ser comprovado no launcher. Avaliações e números de usuários podem entrar aqui conforme forem reais.</p>
-    <div class="confidence-grid">
-      <div><strong>Windows</strong><span>Instalador público</span></div>
-      <div><strong>PIX</strong><span>Renovação pelo site</span></div>
-      <div><strong>Login</strong><span>Licença sincronizada</span></div>
-      <div><strong>Multi-sessão</strong><span>Ambientes separados</span></div>
-    </div>
-  </section>
-
-  <section class="section home-section download-panel" id="download">
-    <div>
-      <div class="section-kicker">DOWNLOAD</div>
-      <h2>Instale e entre na arena.</h2>
-      <p>O download é público. Depois de instalar, faça login para validar seu acesso e utilizar o launcher.</p>
-    </div>
-    <a class="btn primary btn-lg" href="https://github.com/joaovitordc2045-bot/multi-idle-arena/releases/latest/download/Multi-Idle-Arena-Setup.exe">↓ Baixar instalador</a>
-  </section>
-
-    <section class="section home-section pricing-public" id="planos">
-    <div class="section-kicker">PLANOS</div>
-    <div class="section-title-row">
-      <div>
-        <h2>Comece grátis. Fique para sempre por R$ 19.</h2>
-        <p class="lead">Teste o Multi Idle Arena por 8 horas. Se gostar, libere sua conta com um único pagamento — sem mensalidade e sem renovação.</p>
-      </div>
-      <span class="section-number">02</span>
-    </div>
-
-    <div class="pricing-public-grid">
-      <article class="pricing-public-card">
-        <div class="eyebrow">TESTE GRÁTIS</div>
-        <h3>8 horas</h3>
-        <div class="pricing-public-price">R$ 0</div>
-        <p>Crie sua conta e conheça o Multi Idle Arena antes de comprar.</p>
-        <a class="btn full-btn" href="cadastro.html">Começar teste grátis</a>
-      </article>
-
-      <article class="pricing-public-card pricing-public-featured">
-        <div class="eyebrow">PAGAMENTO ÚNICO</div>
-        <div class="pricing-public-badge">VITALÍCIO</div>
-        <h3>Multi Idle Arena Vitalício</h3>
-        <div class="pricing-public-price">R$ 19 <small>uma única vez</small></div>
-        <p>Acesso permanente, sem mensalidade e sem necessidade de renovação.</p>
-        <a class="btn primary full-btn" href="cadastro.html">Começar agora</a>
-      </article>
-    </div>
-  </section>
-
-  <section class="section home-section faq-section" id="duvidas">
-    <div class="section-kicker">DÚVIDAS</div>
-    <h2>Perguntas frequentes.</h2>
-    <div class="faq-list">
-      <details open><summary>Preciso criar conta para baixar?</summary><p>Não. O instalador pode ser baixado publicamente. A conta é usada para acessar e validar a licença no launcher.</p></details>
-      <details><summary>As contas usam a mesma sessão?</summary><p>Não. O launcher foi estruturado para manter sessões persistentes separadas entre as contas adicionadas.</p></details>
-      <details><summary>Posso organizar várias sessões na tela?</summary><p>Sim. O Multi Idle Arena possui organização em grade e modo foco para trabalhar com as sessões abertas.</p></details>
-      <details><summary>Como funciona a renovação?</summary><p>Os planos disponíveis no site podem ser renovados com pagamento via Pix na área da conta.</p></details>
-    </div>
-  </section>
-
-  <section class="final-cta">
-    <img src="arena-logo.png" alt="">
-    <div><small>MULTI IDLE ARENA</small><h2>Mais contas. Uma única arena.</h2><p>Organize suas sessões em um launcher feito para multi-conta.</p></div>
-    <a class="btn primary btn-lg" href="cadastro.html">Criar minha conta</a>
-  </section>
+<section class="v3-hero"><div class="v3-copy"><div class="hero-badge"><i></i> FEITO PARA QUEM USA VÁRIAS CONTAS</div><h1>Várias contas.<br><em>Um só lugar.</em></h1><p>Abra, organize e alterne entre suas sessões de jogos de navegador dentro de um launcher feito para multi-conta.</p><div class="hero-actions"><a class="btn primary btn-lg" href="https://github.com/joaovitordc2045-bot/multi-idle-arena/releases/latest/download/Multi-Idle-Arena-Setup.exe">↓ Baixar para Windows</a><a class="btn btn-lg" id="heroAccountBtn" href="cadastro.html">Começar teste grátis</a></div><div class="v3-mini-trust"><span>✓ 8 horas grátis</span><span>✓ Sem cartão no teste</span><span>✓ R$ 19 vitalício</span></div></div>
+<div class="v3-product"><div class="v3-orbit one">4 <small>CONTAS</small></div><div class="v3-orbit two">2×2 <small>LAYOUT</small></div><div class="v3-orbit three"><b>●</b> <small>SESSÕES ISOLADAS</small></div><div class="v3-window"><div class="v3-windowbar"><span><i></i><i></i><i></i></span><b>Multi Idle Arena</b><em>LICENÇA ATIVA</em></div><img src="launcher-preview.png" alt="Multi Idle Arena com quatro sessões abertas"></div></div></section>
+<section class="v3-bar"><div><b>Multi-sessão</b><span>várias contas no mesmo launcher</span></div><div><b>Sessões separadas</b><span>cookies e logins independentes</span></div><div><b>Grade + foco</b><span>organize do seu jeito</span></div><div><b>Windows</b><span>instalador público</span></div></section>
+<section class="v3-section intro" id="recursos"><div class="v3-heading"><span>01 · CONTROLE</span><h2>Chega de espalhar<br>janelas pelo PC.</h2><p>O Multi Idle Arena foi pensado para transformar várias sessões soltas em um ambiente organizado e fácil de controlar.</p></div><div class="bento">
+<article class="bento-card bento-big"><div><span class="tag">ORGANIZAÇÃO</span><h3>Veja suas contas lado a lado.</h3><p>Use layouts em grade para acompanhar várias sessões ao mesmo tempo e selecione a conta que precisa de atenção.</p></div><div class="fake-grid"><i></i><i></i><i></i><i class="active"></i></div></article>
+<article class="bento-card"><span class="icon">◎</span><h3>Sessões independentes</h3><p>Cada conta mantém seu próprio login, cookies e navegação.</p></article>
+<article class="bento-card"><span class="icon">↗</span><h3>Modo foco</h3><p>Amplie uma sessão sem perder as outras contas abertas.</p></article>
+<article class="bento-card"><span class="icon">◫</span><h3>Workspaces</h3><p>Agrupe suas contas e deixe o ambiente mais organizado.</p></article>
+<article class="bento-card"><span class="icon">⌁</span><h3>CPU e RAM</h3><p>Acompanhe indicadores de uso diretamente no launcher.</p></article>
+</div></section>
+<section class="v3-section demo" id="como-funciona"><div class="demo-shot"><div class="shot-label"><i></i> INTERFACE REAL DO PRODUTO</div><img src="launcher-preview.png" alt="Interface real do Multi Idle Arena"><div class="demo-chip chip1"><b>01</b><span>Adicione suas contas</span></div><div class="demo-chip chip2"><b>02</b><span>Organize em grade</span></div></div><div class="demo-copy"><span class="section-kicker">PRODUTO REAL</span><h2>Abra. Organize.<br><em>Troque.</em> Continue.</h2><p>Você não precisa abrir um navegador diferente para cada conta. O launcher mantém suas sessões reunidas e prontas para alternar.</p><div class="steps"><div><b>01</b><span><strong>Adicione</strong><small>Crie e identifique suas contas.</small></span></div><div><b>02</b><span><strong>Abra</strong><small>Cada sessão funciona separadamente.</small></span></div><div><b>03</b><span><strong>Organize</strong><small>Use grade, foco e troca rápida.</small></span></div></div></div></section>
+<section class="v3-section compare"><div class="v3-heading center"><span>ANTES × DEPOIS</span><h2>Menos bagunça.<br>Mais espaço para jogar.</h2></div><div class="compare-grid"><article class="before"><small>SEM O MULTI IDLE ARENA</small><h3>Várias janelas espalhadas</h3><div class="window-chaos"><i></i><i></i><i></i><i></i></div><p>Alternar entre contas vira uma sequência de janelas e abas abertas.</p></article><article class="after"><small>COM O MULTI IDLE ARENA</small><h3>Tudo dentro de uma arena</h3><div class="window-order"><i></i><i></i><i></i><i></i></div><p>Contas reunidas, identificadas e organizadas em uma única interface.</p></article></div></section>
+<section class="v3-section how"><div class="v3-heading center"><span>COMECE EM MINUTOS</span><h2>Do download às suas contas<br>em três passos.</h2></div><div class="how-grid"><article><b>01</b><div class="how-icon">↓</div><h3>Baixe</h3><p>Instale o Multi Idle Arena no Windows.</p></article><article><b>02</b><div class="how-icon">+</div><h3>Crie sua conta</h3><p>Ganhe 8 horas para testar gratuitamente.</p></article><article><b>03</b><div class="how-icon">▦</div><h3>Monte sua arena</h3><p>Adicione suas sessões e escolha o layout.</p></article></div></section>
+<section class="v3-download" id="download"><div><span>DOWNLOAD PARA WINDOWS</span><h2>Sua arena está a um clique.</h2><p>Baixe o instalador público e experimente o launcher com suas próprias contas.</p></div><a class="btn primary btn-xl" href="https://github.com/joaovitordc2045-bot/multi-idle-arena/releases/latest/download/Multi-Idle-Arena-Setup.exe">↓ Baixar Multi Idle Arena</a></section>
+<section class="v3-section pricing" id="planos"><div class="v3-heading center"><span>ACESSO VITALÍCIO</span><h2>Teste primeiro.<br>Pague uma vez se gostar.</h2><p>Sem mensalidade e sem renovação.</p></div><div class="price-v3"><article><span>TESTE GRÁTIS</span><h3>8 horas</h3><div class="money">R$ 0</div><p>Conheça o launcher antes de comprar.</p><ul><li>✓ Acesso ao launcher</li><li>✓ Teste com suas contas</li><li>✓ Sem pagamento para começar</li></ul><a class="btn full-btn" href="cadastro.html">Criar conta grátis</a></article><article class="featured"><div class="lifetime">VITALÍCIO</div><span>PAGAMENTO ÚNICO</span><h3>Multi Idle Arena</h3><div class="money">R$ 19 <small>uma vez</small></div><p>Libere sua conta permanentemente.</p><ul><li>✓ Sem mensalidade</li><li>✓ Sem renovação</li><li>✓ Acesso permanente</li></ul><a class="btn primary full-btn" href="cadastro.html">Começar agora</a></article></div></section>
+<section class="v3-section faq-section" id="duvidas"><div class="v3-heading"><span>DÚVIDAS FREQUENTES</span><h2>Antes de entrar<br>na arena.</h2></div><div class="faq-list"><details open><summary>Preciso criar conta para baixar?</summary><p>Não. O download do instalador é público. A conta é necessária para entrar no launcher e validar seu acesso.</p></details><details><summary>O teste grátis dura quanto tempo?</summary><p>O período gratuito é de 8 horas para você conhecer o Multi Idle Arena antes de comprar.</p></details><details><summary>Depois do teste existe mensalidade?</summary><p>Não. O acesso vitalício custa R$ 19 em pagamento único, sem mensalidade e sem renovação.</p></details><details><summary>As contas ficam na mesma sessão?</summary><p>Não. O launcher mantém as sessões separadas, com cookies e logins independentes.</p></details><details><summary>Posso organizar várias contas na mesma tela?</summary><p>Sim. O Multi Idle Arena oferece organização em grade e modo foco para alternar entre suas sessões.</p></details></div></section>
+<section class="v3-final"><img src="arena-logo.png" alt=""><div><span>MULTI IDLE ARENA</span><h2>Menos janelas. Mais jogo.</h2><p>Comece grátis e organize suas contas em uma única arena.</p></div><a class="btn primary btn-lg" href="cadastro.html">Testar por 8 horas →</a></section>
 </main>
-
-<footer class="footer home-footer">
-  <div class="footer-brand"><img src="arena-logo.png" alt=""><div><strong>MULTI IDLE ARENA</strong><small>Multi-sessão para jogos idle</small></div></div>
-  <div class="footer-links"><a href="#recursos">Recursos</a><a href="#planos">Planos</a><a href="#download">Download</a><a href="login.html">Entrar</a></div>
-  <span>© 2026 Multi Idle Arena</span>
-</footer>
-
+<footer class="home-footer"><div class="footer-brand"><img src="arena-logo.png" alt=""><div><strong>MULTI IDLE ARENA</strong><small>Multi-sessão para jogos de navegador</small></div></div><div class="footer-links"><a href="#recursos">Recursos</a><a href="#planos">Vitalício</a><a href="#download">Download</a><a href="login.html">Entrar</a></div><span>© 2026 Multi Idle Arena</span></footer>
 <script type="module">
   import { supabase } from './supabase-client.js';
   const accountBtn = document.getElementById('accountNavBtn');
