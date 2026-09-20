@@ -8,6 +8,8 @@ const els = {
   clientsList: document.querySelector('#clientsList'),
   totalClients: document.querySelector('#totalClients'),
   onlineClients: document.querySelector('#onlineClients'),
+  usedToday: document.querySelector('#usedToday'),
+  peakToday: document.querySelector('#peakToday'),
   activeClients: document.querySelector('#activeClients'),
   expiredClients: document.querySelector('#expiredClients'),
   msg: document.querySelector('#msg'),
@@ -101,39 +103,54 @@ await preloadBugCount();
 
 
 async function loadOnlineUsers() {
-  const { data, error } = await supabase.rpc('admin_online_users');
+  const [{ data, error }, statsResult] = await Promise.all([
+    supabase.rpc('admin_online_users'),
+    supabase.rpc('admin_usage_stats')
+  ]);
 
   if (error) {
     console.warn('Não foi possível carregar usuários online:', error);
+  } else {
+    const rows = Array.isArray(data) ? data : [];
+    onlineUsers = new Map(rows.map((row) => [row.user_id, row]));
+
+    if (els.onlineClients) {
+      els.onlineClients.textContent = String(onlineUsers.size);
+    }
+
+    // Atualiza os indicadores na lista sem precisar refazer a consulta de clientes.
+    document.querySelectorAll('.client-row').forEach((row) => {
+      const userId = row.querySelector('.manage-client')?.dataset.user;
+      const info = row.querySelector('.client-info');
+      if (!userId || !info) return;
+
+      let badge = info.querySelector('.client-online');
+      if (onlineUsers.has(userId)) {
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'client-online';
+          badge.innerHTML = '<i class="online-dot"></i>ONLINE';
+          info.appendChild(badge);
+        }
+      } else if (badge) {
+        badge.remove();
+      }
+    });
+  }
+
+  if (statsResult.error) {
+    console.warn('Não foi possível carregar estatísticas de uso:', statsResult.error);
     return;
   }
 
-  const rows = Array.isArray(data) ? data : [];
-  onlineUsers = new Map(rows.map((row) => [row.user_id, row]));
-
-  if (els.onlineClients) {
-    els.onlineClients.textContent = String(onlineUsers.size);
+  const stats = Array.isArray(statsResult.data) ? statsResult.data[0] : statsResult.data;
+  if (stats) {
+    if (els.onlineClients) els.onlineClients.textContent = String(Number(stats.online_now || 0));
+    if (els.usedToday) els.usedToday.textContent = String(Number(stats.used_today || 0));
+    if (els.peakToday) els.peakToday.textContent = String(Number(stats.peak_today || 0));
   }
-
-  // Atualiza os indicadores na lista sem precisar refazer a consulta de clientes.
-  document.querySelectorAll('.client-row').forEach((row) => {
-    const userId = row.querySelector('.manage-client')?.dataset.user;
-    const info = row.querySelector('.client-info');
-    if (!userId || !info) return;
-
-    let badge = info.querySelector('.client-online');
-    if (onlineUsers.has(userId)) {
-      if (!badge) {
-        badge = document.createElement('span');
-        badge.className = 'client-online';
-        badge.innerHTML = '<i class="online-dot"></i>ONLINE';
-        info.appendChild(badge);
-      }
-    } else if (badge) {
-      badge.remove();
-    }
-  });
 }
+
 
 async function loadClients(search = '') {
   setMessage('Carregando clientes...', '');
@@ -163,16 +180,22 @@ function renderClients(clients) {
 
   els.clientsList.innerHTML = clients.map((client) => {
     const expires = client.expires_at ? new Date(client.expires_at) : null;
-    const trialState = client.trial_state || inferLegacyTrialState(client);
-    const statusInfo = clientStatusInfo(trialState);
+    // Licença paga/vitalícia sempre tem prioridade sobre o estado do trial.
+    const licenseState = getClientLicenseState(client);
+    const statusInfo = clientStatusInfo(licenseState);
     const plan = planLabel(client.plan);
 
     let expiry = expires && !Number.isNaN(expires.getTime())
       ? expires.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
       : 'Sem validade';
 
-    if (trialState === 'awaiting_activation') expiry = 'Aguardando 1º acesso';
-    if (trialState === 'trial_blocked') expiry = 'Trial não liberado';
+    if (String(client.plan || '').toLowerCase() === 'lifetime' && client.status === 'active') {
+      expiry = 'Vitalícia · não expira';
+    } else if (licenseState === 'awaiting_activation') {
+      expiry = 'Aguardando 1º acesso';
+    } else if (licenseState === 'trial_blocked') {
+      expiry = 'Trial não liberado';
+    }
 
     const statusTitle = client.last_trial_message || statusInfo.help;
 
@@ -226,6 +249,22 @@ function renderClients(clients) {
   });
 }
 
+function getClientLicenseState(client) {
+  const plan = String(client.plan || '').toLowerCase();
+  const status = String(client.status || '').toLowerCase();
+
+  // Vitalício ativo não depende de trial_state nem de expires_at.
+  if (plan === 'lifetime' && status === 'active') return 'active';
+
+  // Outros planos pagos/administrativos ativos respeitam a validade.
+  if (plan !== 'trial' && status === 'active') {
+    const expiry = client.expires_at ? new Date(client.expires_at).getTime() : 0;
+    if (!expiry || expiry > Date.now()) return 'active';
+  }
+
+  return client.trial_state || inferLegacyTrialState(client);
+}
+
 function inferLegacyTrialState(client) {
   const expiry = client.expires_at ? new Date(client.expires_at).getTime() : 0;
   const start = client.starts_at ? new Date(client.starts_at).getTime() : 0;
@@ -274,7 +313,7 @@ function clientStatusInfo(state) {
 }
 
 function updateSummary(clients) {
-  const states = clients.map((client) => client.trial_state || inferLegacyTrialState(client));
+  const states = clients.map((client) => getClientLicenseState(client));
   const active = states.filter((state) => state === 'active').length;
   const waiting = states.filter((state) => state === 'awaiting_activation').length;
   const blocked = states.filter((state) => state === 'trial_blocked' || state === 'blocked').length;
@@ -598,6 +637,7 @@ function planLabel(plan) {
     weekly: 'Semanal',
     monthly: 'Mensal',
     manual: 'Manual/Admin',
+    lifetime: 'Vitalício',
   }[plan] || (plan || 'Sem plano');
 }
 
