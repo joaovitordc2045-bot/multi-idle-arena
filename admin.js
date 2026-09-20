@@ -145,7 +145,7 @@ async function loadOnlineUsers() {
 
   const stats = Array.isArray(statsResult.data) ? statsResult.data[0] : statsResult.data;
   if (stats) {
-    if (els.onlineClients) els.onlineClients.textContent = String(Number(stats.online_now || 0));
+    // O contador online vem de admin_online_users, sem depender do status da licença.
     if (els.usedToday) els.usedToday.textContent = String(Number(stats.used_today || 0));
     if (els.peakToday) els.peakToday.textContent = String(Number(stats.peak_today || 0));
   }
@@ -180,7 +180,6 @@ function renderClients(clients) {
 
   els.clientsList.innerHTML = clients.map((client) => {
     const expires = client.expires_at ? new Date(client.expires_at) : null;
-    // Licença paga/vitalícia sempre tem prioridade sobre o estado do trial.
     const licenseState = getClientLicenseState(client);
     const statusInfo = clientStatusInfo(licenseState);
     const plan = planLabel(client.plan);
@@ -189,8 +188,10 @@ function renderClients(clients) {
       ? expires.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
       : 'Sem validade';
 
-    if (String(client.plan || '').toLowerCase() === 'lifetime' && client.status === 'active') {
+    if (String(client.plan || '').toLowerCase() === 'lifetime' && String(client.status || '').toLowerCase() === 'active') {
       expiry = 'Vitalícia · não expira';
+    } else if (licenseState === 'trial_in_use') {
+      expiry = 'Em uso agora';
     } else if (licenseState === 'awaiting_activation') {
       expiry = 'Aguardando 1º acesso';
     } else if (licenseState === 'trial_blocked') {
@@ -253,16 +254,22 @@ function getClientLicenseState(client) {
   const plan = String(client.plan || '').toLowerCase();
   const status = String(client.status || '').toLowerCase();
 
-  // Vitalício ativo não depende de trial_state nem de expires_at.
   if (plan === 'lifetime' && status === 'active') return 'active';
 
-  // Outros planos pagos/administrativos ativos respeitam a validade.
   if (plan !== 'trial' && status === 'active') {
     const expiry = client.expires_at ? new Date(client.expires_at).getTime() : 0;
     if (!expiry || expiry > Date.now()) return 'active';
   }
 
-  return client.trial_state || inferLegacyTrialState(client);
+  const trialState = client.trial_state || inferLegacyTrialState(client);
+
+  // Se o launcher está enviando presença, já houve acesso.
+  // Não exibe "aguardando 1º acesso" para alguém que está online.
+  if (trialState === 'awaiting_activation' && onlineUsers.has(client.user_id)) {
+    return 'trial_in_use';
+  }
+
+  return trialState;
 }
 
 function inferLegacyTrialState(client) {
@@ -290,6 +297,11 @@ function clientStatusInfo(state) {
       className: 'waiting',
       help: 'Conta criada. O Trial será validado no primeiro acesso pelo launcher.'
     },
+    trial_in_use: {
+      label: 'TRIAL EM USO',
+      className: 'active',
+      help: 'Usuário conectado ao launcher durante o período de teste.'
+    },
     trial_blocked: {
       label: 'TRIAL BLOQUEADO',
       className: 'blocked',
@@ -314,7 +326,7 @@ function clientStatusInfo(state) {
 
 function updateSummary(clients) {
   const states = clients.map((client) => getClientLicenseState(client));
-  const active = states.filter((state) => state === 'active').length;
+  const active = states.filter((state) => state === 'active' || state === 'trial_in_use').length;
   const waiting = states.filter((state) => state === 'awaiting_activation').length;
   const blocked = states.filter((state) => state === 'trial_blocked' || state === 'blocked').length;
   const expired = states.filter((state) => state === 'expired').length;
